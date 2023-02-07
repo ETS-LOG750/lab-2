@@ -12,12 +12,13 @@ Le code de fourni pour ce laboratoire contient une caméra de type "fly" ou vous
 
 ![Fenêtre de base](imgs/lab-2-start.png width="400px")
 
-Vous devez créer un logiciel simple permettant de positionner, transformer et animer des cubes dans une scène 3D. L'utilisateur va interagir avec l'application de plusieurs manières (interface ImGui, click directement sur les objets montrés à l'écran). Enfin, dans ce sujet, deux fonctionnalités avancées vous sont proposées. Veuillez en mettre en œuvre une pour le laboratoire. 
+Vous devez créer un logiciel simple permettant de positionner, transformer et animer des cubes dans une scène 3D. L'utilisateur va interagir avec l'application de plusieurs manières (interface ImGui, click directement sur les objets montrés à l'écran). Vous devrez donner des rétroactions visuelles à l'utilisateur lorsqu'il intégragi avec l'application.
 
 ![Exemple d'un résultat final du laboratoire avec une rétroaction visuelle active (selection face)](imgs/lab-2-end.png width="400px")
 
 !!! WARN: Important
-    Les exemples pertinents à la réalisation du laboratoire sont "transformation" (cours 5) et "picking" (cours 6 ou lab 2). Vous pouvez réutiliser tel quel le code ou adapter ces exemples (ou tout autre exemple fourni en classe) pour votre laboratoire. 
+    Les exemples pertinents à la réalisation du laboratoire sont "transformation" (cours 5), "picking" (lab 2) et "Obj" (lab 2). Vous pouvez réutiliser tel quel le code ou adapter ces exemples (ou tout autre exemple fourni en classe) pour votre laboratoire. Pour rappel, les exemples sont accessible à l'adresse suivante:
+    https://github.com/ETS-LOG750/example.
     
 !!! ERROR: Attention
     Si vous utilisez des ressources externes, merci de les indiquer dans le rapport dans la section "References".
@@ -53,7 +54,7 @@ Votre application devra permettre d'ajouter de nouveaux cubes et de les transfor
 
 La figure 2 présente des instances des classes et leurs relations. Notez que la racine du graphe de scène est un nœud "Transform" avec une matrice identité. Ce nœud peut avoir plusieurs enfants. Vous devrez utiliser un tel nœud comme racine de votre graphe de scène. Ensuite, pour chaque nouvelle primitive ajoutée dans la scène, par exemple un nœud "Cube" (ou autre classe dérivée de "Node") sera ajouté dans le graphe. Votre hiérarchie de graphe de scène doit permettre d'avoir un arbre d'objet (comme montré ci-dessous) qui supporte une profondeur illimitée. `Mesh` permet de partager les objets OpenGL (ex. VBO) entre les différentes instances de cube. 
 
-![Exemple de diagramme d'objets du graphe de scène](imgs/lab-2-instances.png)
+![Exemple de diagramme d'instance du graphe de scène](imgs/lab-2-instances.png)
 
 Pour réaliser l'affichage, vous devez parcourir le graphe de scène. À chaque nœud "Transform" que vous rencontrez, vous appliquez ses transformations à la matrice de transformation courante `Mc`, puis vous parcourez chacun de ses enfants. Si c'est un nœud "Cube", vous pouvez dessiner le cube (préchargé dans le GPU avec VBO/VAO). Les sommets du cube seront définis en coordonnée locale et transformer par la/les matrice(s) de transformation. 
 
@@ -61,9 +62,7 @@ Pour réaliser l'affichage, vous devez parcourir le graphe de scène. À chaque 
     N'oubliez pas que si vos nœuds font des appels OpenGL lors de leur construction, il faut les construire après les différentes initialisations (GLFW, GLAD, ImGUI, et OpenGL). Par exemple, il n'est pas possible de générer un VBO avant que la fenêtre et le contexte OpenGL soient créés (`MainWindow::Initialisation()`). 
 
 !!! ERROR: Type de noeuds
-    Pour ce laboratoire, il n'est pas nécessaire d'inclure les sources de lumière. Cette intégration peut faire partie des fonctionnalités additionnelles (et doit être expliquée dans le rapport).
-
-    Cependant il est attendu de voir la caméra apparaitre dans le graphe de scène.
+    Pour ce laboratoire, il n'est pas nécessaire d'inclure les sources de lumière dans le graphe de scène. Cette intégration peut faire partie des fonctionnalités additionnelles (et doit être expliquée dans le rapport).
 
 !!! Tip: Patron de conceptions
     Les patrons de conceptions comme ["Composite"](https://refactoring.guru/fr/design-patterns/composite) ou [Visitor](https://refactoring.guru/design-patterns/visitor) sont *extrement* conseillés pour effectuer ce laboratoire. 
@@ -77,6 +76,10 @@ Vous devrez charger et afficher un outil en 3D. Le model 3D (.obj/mtl) est déj�
 Sa position devra être relative à celle de la caméra de sorte à ce qu'il soit toujours visible et que l'utilisateur ait l'impression de tenir cet outil (voir image ci-dessous). Lors de l'ajout d'un cube vous devrez animer cet outil afin d'informer l'utilisateur qu'une action est en cours. Pour y arriver, vous devrez utiliser des transformations 3D (translation, rotation, et/ou changement d'échelle) animées dans le temps. L'evaluation de l'animation sera effectuer dans le volet animation.
 
 ![Positionement et animation de l'outil. Veuillez ignorer l'utilisation des textures. Pour visualiser l'animation, voir ce document sous format web. La première version du sujet est incluse dans votre répertoire Git.](imgs/lab2-outil.gif width="400px")
+
+!!! Tip: Variable: `ASSETS_DIR`
+    Une variable `ASSETS_DIR` contient le chemin absolu vers le dossier `assets` se trouvant à la racine du projet. Merci d'utiliser cette variable pour pouvoir charger le modèle 3D. Cette variable a la même fonctionalité que la variable `SHADERS_DIR` utilisée pour charger des nuanceurs. 
+
 
 ### Éclairage (10 pts)
 

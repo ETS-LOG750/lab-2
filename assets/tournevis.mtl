@@ -1,0 +1,12 @@
+# File created by François Dagenais
+newmtl manche
+Ka 1.0 1.0 1.0
+Kd 0.13 0.13 1.0
+Ks 0.05 0.05 0.05
+Ns 1000
+
+newmtl metal
+Ka 0.7 0.7 0.7
+Kd 0.9 0.9 1.0
+Ks 1.0 1.0 1.0
+Ns 10
