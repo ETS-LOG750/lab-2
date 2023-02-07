@@ -12,12 +12,12 @@ Le code de fourni pour ce laboratoire contient une caméra de type "fly" ou vous
 
 ![Fenêtre de base](imgs/lab-2-start.png width="400px")
 
-Vous devez créer un logiciel simple permettant de positionner, transformer et animer des cubes dans une scène 3D. L'utilisateur va interagir avec l'application de plusieurs manières (interface ImGui, click directement sur les objets montrés à l'écran). Vous devrez donner des rétroactions visuelles à l'utilisateur lorsqu'il intégragi avec l'application.
+Vous devez créer un logiciel simple permettant de positionner, transformer et animer des cubes dans une scène 3D. L'utilisateur va interagir avec l'application de plusieurs manières (interface ImGui, click directement sur les objets montrés à l'écran). Vous devrez donner des rétroactions visuelles à l'utilisateur lorsqu'il interagit avec l'application.
 
 ![Exemple d'un résultat final du laboratoire avec une rétroaction visuelle active (selection face)](imgs/lab-2-end.png width="400px")
 
 !!! WARN: Important
-    Les exemples pertinents à la réalisation du laboratoire sont "transformation" (cours 5), "picking" (lab 2) et "Obj" (lab 2). Vous pouvez réutiliser tel quel le code ou adapter ces exemples (ou tout autre exemple fourni en classe) pour votre laboratoire. Pour rappel, les exemples sont accessible à l'adresse suivante:
+    Les exemples pertinents à la réalisation du laboratoire sont "transformation" (cours 5), "picking" (lab 2) et "Obj" (lab 2). Vous pouvez réutiliser tel quel le code ou adapter ces exemples (ou tout autre exemple fourni en classe) pour votre laboratoire. Pour rappel, les exemples sont accessibles à l'adresse suivante:
     https://github.com/ETS-LOG750/example.
     
 !!! ERROR: Attention
@@ -27,7 +27,7 @@ Vous devez créer un logiciel simple permettant de positionner, transformer et a
 
 De la même manière que pour le laboratoire 1. Cependant, comme le code de départ est différent, vous allez devoir utiliser un nouveau lien GitHub classroom pour initialiser le nouveau projet. Veuillez suivre les instructions du laboratoire 1 pour plus de détail. 
 
-__Utilisez Discord et informer vos coéquipiers de la création du groupe sur GitHub classroom. Le lien pour rejoindre la Github classroom est disponible sur Moodle__.
+__Utilisez Discord et informez vos coéquipiers de la création du groupe sur GitHub classroom. Le lien pour rejoindre la Github classroom est disponible sur Moodle__.
 
 Vous pouvez suivre la documentation officielle de Github pour la configuration: https://docs.github.com/en/get-started/quickstart/set-up-git 
 
@@ -35,7 +35,7 @@ Vous pouvez suivre la documentation officielle de Github pour la configuration: 
 
 # Devoir (100 pt)
 
-La structure du code de base est similaire au premier laboratoire. Le changement principal est l'ajout d'une caméra contrôlable avec le clavier utilisateur. La logique de caméra est mise en œuvre dans les fichiers `Camera.{cpp/h}`. La redirection des évènements claviers sont effectuer dans `MainWindow.cpp` (`MainWindow::InitializeCallback()`) en utilisant les ["callbacks"](https://www.glfw.org/docs/3.3/input_guide.html) de GLFW. Le nuanceur par défaut `basic.{vert/frag}` prends les informations de normales et de positions et les transforme dans l'espace de la caméra (Cours 6). Cela signifie que les calculs effectués dans le nuanceur de fragments sont dans l'espace caméra (comme la convention que nous verrons en cours 6).
+La structure du code de base est similaire au premier laboratoire. Le changement principal est l'ajout d'une caméra contrôlable avec le clavier et la souris. La logique de caméra est mise en œuvre dans les fichiers `Camera.{cpp/h}`. La redirection des évènements claviers sont effectuer dans `MainWindow.cpp` (`MainWindow::InitializeCallback()`) en utilisant les ["callbacks"](https://www.glfw.org/docs/3.3/input_guide.html) de GLFW. Le nuanceur par défaut `basic.{vert/frag}` prend les informations de normales et de positions et les transforme dans l'espace de la caméra (Cours 6). Cela signifie que les calculs effectués dans le nuanceur de fragments sont dans l'espace caméra (convention que nous verrons en cours 6).
 
 Il est essentiel qu'au lancement, votre application permette de démontrer que vous avez bien mis en œuvre les fonctionnalités de base. 
 
@@ -48,11 +48,13 @@ Il est essentiel qu'au lancement, votre application permette de démontrer que v
 
 Initialement, la scène doit contenir des cubes disposés dans une grille alignée sur les axes. Ceux-ci doivent être disposés pour former 10 rangées et 10 colonnes. Ce « plancher » doit reposer sur le plan XZ et être **centré** à l'origine (0,0,0). La normale au plan XZ est Y. De plus, chaque cube a une dimension de 1x1x1 unités. 
 
-Votre application devra permettre d'ajouter de nouveaux cubes et de les transformer de façon hiérarchique. Pour ce laboratoire, vous devez mettre en place une structure de graphe de scène.  Les primitives doivent ainsi être conservées dans un graphe de scène simple (patron de conception Composite). Il faut aussi que les transformations (animée ou non) soient présentes dans le graphe de scène. La figure ci-dessus montre un exemple de hiérarchie de classes appropriées pour le laboratoire.
+Votre application devra permettre d'ajouter de nouveaux cubes et de les transformer de façon hiérarchique. Pour ce laboratoire, vous devez mettre en place une structure de graphe de scène.  Les primitives doivent ainsi être conservées dans un graphe de scène simple (patron de conception composite). Il faut aussi que les transformations (animée ou non) soient présentes dans le graphe de scène. La figure ci-dessus montre un exemple de hiérarchie de classes appropriées pour le laboratoire.
 
-![Example de hierachie de classe conseillée pour le laboratoire 2](imgs/lab-2-diagram.png)
+![Exemple de hiérarchie de classe conseillée pour le laboratoire 2](imgs/lab-2-diagram.png)
 
-La figure 2 présente des instances des classes et leurs relations. Notez que la racine du graphe de scène est un nœud "Transform" avec une matrice identité. Ce nœud peut avoir plusieurs enfants. Vous devrez utiliser un tel nœud comme racine de votre graphe de scène. Ensuite, pour chaque nouvelle primitive ajoutée dans la scène, par exemple un nœud "Cube" (ou autre classe dérivée de "Node") sera ajouté dans le graphe. Votre hiérarchie de graphe de scène doit permettre d'avoir un arbre d'objet (comme montré ci-dessous) qui supporte une profondeur illimitée. `Mesh` permet de partager les objets OpenGL (ex. VBO) entre les différentes instances de cube. 
+L'image ci-dessous présente des instances des classes et leurs relations. Ce diagramme est uniquement pour vous donner une idée de comment organiser votre code. Il reste incomplet, manquant par exemple l'objet 3D attaché à la caméra. 
+
+Notez que la racine du graphe de scène est un nœud "Transform" avec une matrice identité. Ce nœud peut avoir plusieurs enfants. Vous devrez utiliser un tel nœud comme racine de votre graphe de scène. Ensuite, pour chaque nouvelle primitive ajoutée dans la scène, par exemple un nœud "Cube" (ou autre classe dérivée de "Node") sera ajouté dans le graphe. Votre hiérarchie de graphe de scène doit permettre d'avoir un arbre d'objet (comme montré ci-dessous) qui supporte une profondeur illimitée. `Mesh` permets de partager les objets OpenGL (ex. VBO) entre les différentes instances de cube. 
 
 ![Exemple de diagramme d'instance du graphe de scène](imgs/lab-2-instances.png)
 
@@ -61,33 +63,36 @@ Pour réaliser l'affichage, vous devez parcourir le graphe de scène. À chaque 
 !!! WARN: Attention
     N'oubliez pas que si vos nœuds font des appels OpenGL lors de leur construction, il faut les construire après les différentes initialisations (GLFW, GLAD, ImGUI, et OpenGL). Par exemple, il n'est pas possible de générer un VBO avant que la fenêtre et le contexte OpenGL soient créés (`MainWindow::Initialisation()`). 
 
-!!! ERROR: Type de noeuds
+!!! ERROR: Type de nœuds
     Pour ce laboratoire, il n'est pas nécessaire d'inclure les sources de lumière dans le graphe de scène. Cette intégration peut faire partie des fonctionnalités additionnelles (et doit être expliquée dans le rapport).
 
 !!! Tip: Patron de conceptions
-    Les patrons de conceptions comme ["Composite"](https://refactoring.guru/fr/design-patterns/composite) ou [Visitor](https://refactoring.guru/design-patterns/visitor) sont *extrement* conseillés pour effectuer ce laboratoire. 
+    Les patrons de conceptions comme ["Composite"](https://refactoring.guru/fr/design-patterns/composite) ou [Visitor](https://refactoring.guru/design-patterns/visitor) sont *extrêmement* conseillés pour effectuer ce laboratoire. 
 
-Advenant que les cubes qui sont trop proches ou trop loin deviennent invisibles, ajustez la taille de la scène avec la méthode `setSceneRadius()` de la classe `Camera`. Ceci ajuste les plans near et far de la caméra, mais ne bouge pas la caméra. Pour déplacer la caméra afin de voir la scène en entier, appeler la méthode `showEntireScene()` de la classe `Camera`. Plus de détails de cette fonctionalité lors du cours 6.
+Advenant que les cubes qui sont trop proches ou trop loin deviennent invisibles, ajustez la taille de la scène avec la méthode `setSceneRadius()` de la classe `Camera`. Ceci ajuste les plans `near` et `far` de la caméra, mais ne bouge pas la caméra. Pour déplacer la caméra afin de voir la scène en entier, appeler la méthode `showEntireScene()` de la classe `Camera`. Plus de détails de cette fonctionnalité lors du cours 6.
+
+!!! WARN: Profondeur affichée
+	La perte de vue des objets à cause de valeurs incorrectes pour les valeurs `near` et `far` de la caméra fera perdre des points. 
 
 ### Chargement objet 3D (10 pts)
 
-Vous devrez charger et afficher un outil en 3D. Le model 3D (.obj/mtl) est déjà disponible dans votre répertoire Git. Veuillez utiliser les paramètres des matériaux défini dans le fichier du model 3D. 
+Vous devrez charger et afficher un outil en 3D. Le modèle 3D (.obj/mtl) est déjà disponible dans votre répertoire Git. Veuillez utiliser les paramètres des matériaux définis dans le fichier du modèle 3D. 
 
-Sa position devra être relative à celle de la caméra de sorte à ce qu'il soit toujours visible et que l'utilisateur ait l'impression de tenir cet outil (voir image ci-dessous). Lors de l'ajout d'un cube vous devrez animer cet outil afin d'informer l'utilisateur qu'une action est en cours. Pour y arriver, vous devrez utiliser des transformations 3D (translation, rotation, et/ou changement d'échelle) animées dans le temps. L'evaluation de l'animation sera effectuer dans le volet animation.
+Sa position devra être relative à celle de la caméra de sorte qu'il soit toujours visible et que l'utilisateur ait l'impression de tenir cet outil (voir image ci-dessous). Lors de l'ajout d'un cube, vous devrez animer cet outil afin d'informer l'utilisateur qu'une action est en cours. Pour y arriver, vous devrez utiliser des transformations 3D (translation, rotation, et/ou changement d'échelle) animées dans le temps. L'évaluation de l'animation sera effectuée dans le volet animation.
 
-![Positionement et animation de l'outil. Veuillez ignorer l'utilisation des textures. Pour visualiser l'animation, voir ce document sous format web. La première version du sujet est incluse dans votre répertoire Git.](imgs/lab2-outil.gif width="400px")
+![Positionnement et animation de l'outil. Veuillez ignorer l'utilisation des textures dans cette image. Pour visualiser l'animation, voir ce document sous format web. La première version du sujet est incluse dans votre répertoire Git.](imgs/lab2-outil.gif width="400px")
 
 !!! Tip: Variable: `ASSETS_DIR`
-    Une variable `ASSETS_DIR` contient le chemin absolu vers le dossier `assets` se trouvant à la racine du projet. Merci d'utiliser cette variable pour pouvoir charger le modèle 3D. Cette variable a la même fonctionalité que la variable `SHADERS_DIR` utilisée pour charger des nuanceurs. 
+    Une variable `ASSETS_DIR` contient le chemin absolu vers le dossier `assets` se trouvant à la racine du projet. Merci d'utiliser cette variable pour pouvoir charger le modèle 3D. Cette variable a la même fonctionnalité que la variable `SHADERS_DIR` utilisée pour charger des nuanceurs. 
 
 
 ### Éclairage (10 pts)
 
-Les cubes doivent posséder des matériaux et être éclairés correctement. À cet effet, vous devez réutiliser votre code du laboratoire 1. L'environnement comportera deux lumières : 
+Les objets composant la scène doivent posséder des matériaux et être éclairés correctement. À cet effet, vous devez réutiliser votre code du laboratoire 1. L'environnement comportera deux lumières : 
 - Une lumière ponctuelle contrôlée et animée par une courbe fermée (voir le volet animation).
 - Une lumière directionnelle orientée en direction de (-1, -1, -1). Cette direction est fixe dans le monde et ne change pas si la caméra se déplace.  
 
-La couleur de chaque lumière devra être contrôlée de façon indépendante. 
+La couleur de chaque lumière devra être contrôlée de façon indépendante par l'utilisateur. 
 
 !!! ERROR: Laboratoire 1
     Si vous n'avez pas réussi à réaliser cette fonctionnalité correctement au laboratoire 1, n'hésitez pas à contacter les chargés de laboratoire ou le professeur afin d'avoir de l'aide pour vous assurer d'avoir une implémentation appropriée et fonctionnelle.
@@ -100,7 +105,7 @@ En plus des interactions utilisant l'interface ImGUi, deux interactions supplém
 - **Interaction avec un point de contrôle de la trajectoire de la source ponctuelle**: Alt-Click
 
 !!! Tip: Code d'exemple
-    Les interactions s'effectueront directement en cliquant sur les objets affichés à l'écran. Pour trouver l'objet sélectionné, veuillez regarder les exemples sur le "picking". Nous verrons plusieurs façon d'effectuer cette opération.
+    Les interactions s'effectueront directement en cliquant sur les objets affichés à l'écran. Pour trouver l'objet sélectionné, veuillez regarder les exemples sur le "picking". Nous verrons plusieurs façons d'effectuer cette opération.
 
 #### Interaction avec un cube
 
@@ -111,15 +116,15 @@ L'utilisation devra pouvoir sélectionner un cube en le cliquant directement dan
 L'utilisateur devra pouvoir ajouter un nouveau cube sur une face de n'importe quel cube. **Une rétroaction visuelle doit en tout temps indiquer (si shift est maintenu) à l'utilisateur qu'il peut positionner un cube lorsqu'une face d'un cube se trouve sous le curseur.** Cette rétroaction doit indiquer clairement à l'utilisateur où sera positionné le cube.
 
 !!! Tip: GLFW
-    Pour connaître si une touche est pressé, vous pouvez appeler `glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS` dans la boucle de rendu. 
+    Pour connaître si une touche est pressée, vous pouvez appeler `glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS` dans la boucle de rendu. 
 
-#### Intéraction avec un point de contrôle
+#### Interaction avec un point de contrôle
 
-Il est attendu que le chemin de votre source ponctuelle soit contrôlé par deux courbe de Bézier fermée. Maintenir la touche Alt doit permettre de visualizer la position des points de contrôle dans la scène. La selection d'un point de contrôle doît permettre de modifier sa position avec ImGui. La trajectoire de la courbe doit resté fermée en tout temps. 
+Il est attendu que le chemin de votre source ponctuelle soit contrôlé par au moins deux courbes de Bézier produisant une trajectoire fermée. Maintenir la touche Alt doit permettre de visualiser la position des points de contrôle dans la scène. La sélection d'un point de contrôle (par Alt+Click) doit permettre de modifier sa position avec ImGui. La trajectoire de la courbe doit rester fermée en tout temps. 
 
 #### Rétroaction visuelle
 
-Une rétroaction visuelle est un signal permettant d'identifier facilement une face ou un cube sélectionné. C'est à vous de décider quelle rétroaction à mettre en place. Des rétroactions visuelles sophistiquées pourront être considérées comme une fonctionnalité additionnelle (points supplémentaires).
+Une rétroaction visuelle est un signal permettant d'identifier facilement une face ou un cube sélectionné. C'est à vous de décider quelle rétroaction à mettre en place. Des rétroactions visuelles sophistiquées pourront être considérées comme une fonctionnalité additionnelle (points supplémentaires). La motivation de la rétroaction visuelle choisie devra être expliquée dans le rapport.
 
 ### Modélisation et transformation hiérarchique (15 pts)
 
@@ -133,16 +138,16 @@ L'utilisateur devra avoir la possibilité de tourner le cube sélectionné en cl
 
 La rotation devra être animée dans le temps afin d'effectuer une rotation totale de 90 degrés. Notez que l'animation uniquement débute quand l'utilisateur a cliqué sur un button de transformation. 
 
-L'animation de la position de la source de lumière ponctuelle s'effectura en utilisant une suite de courbe de Bézier. La position de la source de lumière sera proportionellement au temps écoulé. 
+L'animation de la position de la source de lumière ponctuelle s'effectuera en utilisant une suite de courbe de Bézier. La position de la source de lumière sera proportionnellement au temps écoulé. 
 
 Enfin d'animation de l'outil devra être effectué lors de l'ajout d'un cube uniquement.
 
 !!! WARN: Interactions utilisateur
-    L'animation du cube doit être robuste aux entrées de l'utilisateur. Il faut que votre application fonctionne correctement même si l'utilisateur intéragi rapidement avec votre application.
+    L'animation du cube doit être robuste aux entrées de l'utilisateur. Il faut que votre application fonctionne correctement même si l'utilisateur interagit rapidement avec votre application.
 
 ## Fonctionnalités additionnelles (10 pts)
 
-L'application doit aussi avoir des particularités additionnelles. Pour avoir tous les points, vos particularités additionnelles doivent être conséquentes (suffisamment complexes et difficiles à réaliser) et se comparer favorablement à celles des autres équipes. Vous pouvez voir ceci comme une compétition entre les équipes. Vous devez décrire ces fonctionalités additonnelles dans le rapport. 
+L'application doit aussi avoir des particularités additionnelles. Pour avoir tous les points, vos particularités additionnelles doivent être conséquentes (suffisamment complexes et difficiles à réaliser) et se comparer favorablement à celles des autres équipes. Vous pouvez voir ceci comme une compétition entre les équipes. Vous devez décrire ces fonctionnalités additionnelles dans le rapport. 
 
 **Les particularités additionnelles ne peuvent pas correspondre à des exigences des laboratoires à venir. En particulier: **
 - Pas d'utilisation de textures
@@ -155,7 +160,7 @@ Voici quelques exemples de fonctionnalités additionnelles:
 - permettre d'avoir un matériel différent par face
 - permettre de copier une hiérarchie de cube
 - sélection multiple de carrés (box select) avec une rétroaction visuelle spécifique
-- sauvegarde et chargement du monde (ex. json). Vous pouvez utiliser des bibliothèque externe. 
+- sauvegarde et chargement du monde (ex. json). Vous pouvez utiliser des bibliothèques externes. 
 - ajout ou retrait de certaines sections de la trajectoire de la source ponctuelle
 
 ## Correction
