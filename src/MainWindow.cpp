@@ -136,7 +136,12 @@ void MainWindow::RenderImgui()
 	//imgui 
 	{
 		ImGui::Begin("Labo 2");
-		ImGui::Text("Rotations: ");
+	
+		// TODO: Changer la valeur de ce boolean pour activer
+		// les buttons uniquement quand un cube est selectionné
+		bool notSelectedCube = true;
+		ImGui::Text("Rotation Cube: ");
+		ImGui::BeginDisabled(notSelectedCube);
 		// X
 		bool rotationXN = ImGui::Button("X-"); 
 		ImGui::SameLine(); 
@@ -149,8 +154,20 @@ void MainWindow::RenderImgui()
 		bool rotationZN = ImGui::Button("Z-"); 
 		ImGui::SameLine(); 
 		bool rotationZP = ImGui::Button("Z+");
+		ImGui::EndDisabled();
+
+		// Position curve
+		ImGui::Separator();
+		bool notSelectedControlPoint = true;
+		ImGui::Text("Point de controle: ");
+		ImGui::BeginDisabled(notSelectedControlPoint);
+		static glm::vec3 position;  // TODO: Utiliser un attribut de classe
+		ImGui::SliderFloat3("Position", &position[0], -10, 10);
+		ImGui::EndDisabled();
+
 		ImGui::End();
 
+		// Logic
 		if(rotationXN) {
 			std::cout << "Rotation -X\n";
 		}
