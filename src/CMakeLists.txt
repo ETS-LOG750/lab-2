@@ -1,12 +1,12 @@
 # Add source files
 SET(SOURCE_FILES 
-	Main.cpp MainWindow.cpp ShaderProgram.cpp
+	Main.cpp MainWindow.cpp ShaderProgram.cpp OBJLoader.cpp Camera.cpp
 )
 set(HEADER_FILES 
-	MainWindow.h ShaderProgram.h
+	MainWindow.h ShaderProgram.h OBJLoader.h Camera.h
 )
 set(SHADER_FILES 
-	basic.vert basic.frag
+	basicShader.vert basicShader.frag
 )
 
 # Define the executable
