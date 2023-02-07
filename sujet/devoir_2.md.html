@@ -1,0 +1,160 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+**LOG 750 - Laboratoire 2 - Version 1.0**
+
+# Objectifs du laboratoire
+- Se familiariser avec la modélisation, les transformations et l'utilisation d'une caméra
+- Se familiariser avec la création et l'utilisation de graphe de scène
+- Mise en œuvre de mécanique simple d'animation
+- Utilisation de la sélection (picking) comme nouvelle forme d'interaction utilisateur
+
+Le code de fourni pour ce laboratoire contient une caméra de type "fly" ou vous pouvez contrôler l'orientation de celle-ci en maintenant clic gauche et en bougeant le curseur. Le déplacement s'effectue avec les touches clavier WASD. Par ailleurs, le contrôle de caméra est désactivé si vous interagissez avec l'interface de ImGUI.
+
+![Fenêtre de base](imgs/lab-2-start.png width="400px")
+
+Vous devez créer un logiciel simple permettant de positionner, transformer et animer des cubes dans une scène 3D. L'utilisateur va interagir avec l'application de plusieurs manières (interface ImGui, click directement sur les objets montrés à l'écran). Enfin, dans ce sujet, deux fonctionnalités avancées vous sont proposées. Veuillez en mettre en œuvre une pour le laboratoire. 
+
+![Exemple d'un résultat final du laboratoire avec une rétroaction visuelle active (selection face)](imgs/lab-2-end.png width="400px")
+
+!!! WARN: Important
+    Les exemples pertinents à la réalisation du laboratoire sont "transformation" (cours 5) et "picking" (cours 6 ou lab 2). Vous pouvez réutiliser tel quel le code ou adapter ces exemples (ou tout autre exemple fourni en classe) pour votre laboratoire. 
+    
+!!! ERROR: Attention
+    Si vous utilisez des ressources externes, merci de les indiquer dans le rapport dans la section "References".
+
+# Récupérer le code de base 
+
+De la même manière que pour le laboratoire 1. Cependant, comme le code de départ est différent, vous allez devoir utiliser un nouveau lien GitHub classroom pour initialiser le nouveau projet. Veuillez suivre les instructions du laboratoire 1 pour plus de détail. 
+
+__Utilisez Discord et informer vos coéquipiers de la création du groupe sur GitHub classroom. Le lien pour rejoindre la Github classroom est disponible sur Moodle__.
+
+Vous pouvez suivre la documentation officielle de Github pour la configuration: https://docs.github.com/en/get-started/quickstart/set-up-git 
+
+**N'hésitez pas de contacter le chargé de laboratoire ou professeur (p. ex. sur le discord), si vous avez la moindre question.**
+
+# Devoir (100 pt)
+
+La structure du code de base est similaire au premier laboratoire. Le changement principal est l'ajout d'une caméra contrôlable avec le clavier utilisateur. La logique de caméra est mise en œuvre dans les fichiers `Camera.{cpp/h}`. La redirection des évènements claviers sont effectuer dans `MainWindow.cpp` (`MainWindow::InitializeCallback()`) en utilisant les ["callbacks"](https://www.glfw.org/docs/3.3/input_guide.html) de GLFW. Le nuanceur par défaut `basic.{vert/frag}` prends les informations de normales et de positions et les transforme dans l'espace de la caméra (Cours 6). Cela signifie que les calculs effectués dans le nuanceur de fragments sont dans l'espace caméra (comme la convention que nous verrons en cours 6).
+
+Il est essentiel qu'au lancement, votre application permette de démontrer que vous avez bien mis en œuvre les fonctionnalités de base. 
+
+!!! ERROR: Attention
+    Il faut que votre application soit robuste aux interactions utilisateurs. C'est votre responsabilité de vérifier si les paramètres utilisateur spécifiés dans ImGUI sont valides ou non. Si lors de la correction, votre application n'est pas robuste, vous allez perdre des points. 
+
+## Fonctionnalités principales (85 pts)
+
+### Description et mise en œuvre graphe de scène (10 pts)
+
+Initialement, la scène doit contenir des cubes disposés dans une grille alignée sur les axes. Ceux-ci doivent être disposés pour former 10 rangées et 10 colonnes. Ce « plancher » doit reposer sur le plan XZ et être centré à l'origine (0,0,0). La normale au plan XZ est Y. De plus, chaque cube a une dimension de 1x1x1 unités. 
+
+Votre application devra permettre d'ajouter de nouveaux cubes et de les transformer de façon hiérarchique. Pour ce laboratoire, vous devez mettre en place une structure de graphe de scène.  Les primitives doivent ainsi être conservées dans un graphe de scène simple (patron de conception Composite). Il faut aussi que les transformations (animée ou non) soient présentes dans le graphe de scène. La figure ci-dessus montre un exemple de hiérarchie de classes appropriées pour le laboratoire.
+
+![Hierachie de classe conseillée pour le laboratoire 2](imgs/lab-2-diagram.png)
+
+La figure 2 présente des instances des classes et leurs relations. Notez que la racine du graphe de scène est un nœud "Transform" avec une matrice identité. Ce nœud peut avoir plusieurs enfants. Vous devrez utiliser un tel nœud comme racine de votre graphe de scène. Ensuite, pour chaque nouvelle primitive ajoutée dans la scène, par exemple un nœud "Cube" (ou autre classe dérivée de "Node") sera ajouté dans le graphe. Votre hiérarchie de graphe de scène doit permettre d'avoir un arbre d'objet (comme montré ci-dessous) qui supporte une profondeur illimitée.
+
+![Exemple de diagramme d'objets du graphe de scène.](imgs/lab-2-instances.png)
+
+Pour réaliser l'affichage, vous devez parcourir le graphe de scène. À chaque nœud "Transform" que vous rencontrez, vous appliquez ses transformations à la matrice de transformation courante Mc, puis vous parcourez chacun de ses enfants. Si c'est un nœud "Cube", vous pouvez dessiner le cube (préchargé dans le GPU avec VBO/VAO). Les sommets du cube seront définis en coordonnée locale et transformer par la/les matrice(s) de transformation. 
+
+!!! WARN: Attention
+    N'oubliez pas que si vos nœuds font des appels OpenGL lors de leur construction, il faut les construire après les différentes initialisations (GLFW, GLAD, ImGUI, et OpenGL). Par exemple, il n'est pas possible de générer un VBO avant que la fenêtre et le contexte OpenGL soient créés (`MainWindow::Initialisation()`). 
+
+!!! Tip
+    Pour ce laboratoire, il n'est pas nécessaire d'inclure les sources de lumière et la caméra dans le graphe de scène. Cette intégration peut faire partie des fonctionnalités additionnelles (et doit être expliquée dans le rapport).
+
+Advenant que les cubes qui sont trop proches ou trop loin deviennent invisibles, ajustez la taille de la scène avec la méthode `setSceneRadius()` de la classe `Camera`. Ceci ajuste les plans near et far de la caméra, mais ne bouge pas la caméra. Pour déplacer la caméra afin de voir la scène en entier, appeler la méthode `showEntireScene()` de la classe `Camera`.
+
+### Éclairage (10 pts)
+
+Les cubes doivent posséder des matériaux et être éclairés correctement. À cet effet, vous devez réutiliser votre code du laboratoire 1. L'environnement comportera deux lumières : 
+- Une lumière ponctuelle à la position de la caméra. Pour un éclairage plus plaisant, vous pouvez retirer l'atténuation par rapport à la distance. 
+- Une lumière directionnelle orientée en direction de (-1, -1, -1). Cette direction est fixe dans le monde et ne change pas si la caméra se déplace.  
+
+La couleur de chaque lumière devra être contrôlée de façon indépendante. 
+
+!!! ERROR: Laboratoire 1
+    Si vous n'avez pas réussi à réaliser cette fonctionnalité correctement au laboratoire 1, n'hésitez pas à contacter les chargés de laboratoire ou le professeur afin d'avoir de l'aide pour vous assurer d'avoir une implémentation appropriée et fonctionnelle.
+
+### Sélection, rétroaction visuelle et interaction (face, cube) (25 pts)
+
+En plus des interactions utilisant l'interface ImGUi, deux interactions supplémentaires doivent être mises en œuvre:
+- **Interaction avec un cube**: Ctrl-Click
+- **Interaction avec une face**: Shift-Click
+
+!!! Tip
+    Les interactions s'effectueront directement en cliquant sur les objets affichés à l'écran. Pour trouver l'objet sélectionné, veuillez regarder les exemples sur le "picking". 
+
+#### Interaction avec un cube
+
+L'utilisation devra pouvoir sélectionner un cube en le cliquant directement dans la fenêtre d'affichage. Le cube sélectionné sera le cube se trouvant sous le curseur. **Une rétroaction visuelle doit être maintenue si un cube est actuellement sélectionné**. Vous devez aussi proposer un mécanisme pour retirer cette sélection. 
+
+#### Interaction avec une face
+
+L'utilisateur devra pouvoir ajouter un nouveau cube sur une face de n'importe quel cube. **Une rétroaction visuelle doit en tout temps indiquer (si shift est maintenu) à l'utilisateur qu'il peut positionner un cube lorsqu'une face d'un cube se trouve sous le curseur.** Cette rétroaction doit indiquer clairement à l'utilisateur où sera positionné le cube.
+
+#### Rétroaction visuelle
+
+Une rétroaction visuelle est un signal permettant d'identifier facilement une face ou un cube sélectionné. C'est à vous de décider quelle rétroaction à mettre en place. Des rétroactions visuelles sophistiquées pourront être considérées comme une fonctionnalité additionnelle (points supplémentaires).
+
+### Modélisation et transformation hiérarchique (15 pts)
+
+La modélisation hiérarchique sera mise en œuvre à l'aide du graphe de scène. 
+
+L'utilisateur devra avoir la possibilité de tourner le cube sélectionné en cliquant sur un bouton de l'interface utilisateur. L'utilisateur devra pouvoir choisir l'axe de rotation et le sens (horaire ou antihoraire) (voir Figure 3). **Toutes les transformations appliquées sur un cube seront aussi appliquées à ses cubes enfant grâce au parcours du graphe de scène.*** Veuillez noter que vous n'avez pas besoin de gérer les collisions et interpénétrations engendrées par ces transformations.
+
+![Exemple d'une rotation dans une modélisation hiérarchique. Pour visualiser l'animation, voir ce document sous format web. La première version du sujet est incluse dans votre répertoire Git.](imgs/lab2-rotation.gif  width="400px")
+
+### Animation (10 pts)
+
+La rotation devra être animée dans le temps afin d'effectuer une rotation totale de 90 degrés. Notez que l'animation uniquement débute quand l'utilisateur a cliqué sur un button de transformation. 
+
+!!! WARN: Interactions utilisateur
+    L'animation du cube doit être robuste aux entrées de l'utilisateur. Il faut que votre application fonctionne correctement même si l'utilisateur reclique sur une transformation pendant la période d'animation. 
+
+### Fonctionnalité avancée (25 pts)
+
+
+
+## Fonctionnalités additionnelles (15 pts)
+
+L'application doit aussi avoir des particularités additionnelles. Pour avoir tous les points, vos particularités additionnelles doivent être conséquentes (suffisamment complexes et difficiles à réaliser) et se comparer favorablement à celles des autres équipes. Vous pouvez voir ceci comme une compétition entre les équipes. 
+
+**Les particularités additionnelles ne peuvent pas correspondre à des exigences des laboratoires à venir. En particulier: **
+- Pas d'utilisation de textures
+- Pas de normal mapping
+- Pas de shadow mapping 
+
+Voici quelques exemples de fonctionnalités additionnelles:
+- éléments semi-transparents
+- permettre de changer le matériel de chaque cube indépendamment
+- permettre d'avoir un matériel différent par face
+- permettre de copier une hiérarchie de cube
+- sélection multiple de carrés (box select) avec une rétroaction visuelle spécifique
+- sauvegarde et chargement du monde
+- décalage de la source de lumière attachée à la caméra (graphe de scène)
+
+## Correction
+
+Il y aura correction interactive du laboratoire à la séance qui suit immédiatement la remise. **La présence à cette séance de laboratoire est donc essentielle**, car le chargé de laboratoire demandera à voir le fonctionnement de l'application et pourra demander des explications sur le design et le code.
+
+Il y aura évaluation du travail en équipe. Vous devrez remplir un formulaire d'auto-évaluation et d'évaluation du travail de vos coéquipiers via Teammates. Votre note finale pourrait ainsi varier de +/- 10 %.
+
+Utiliser le gabarit de rapport. Le gabarit contient la grille de correction ainsi que la pondération pour chaque élément. 
+
+## Soumettre votre devoir
+
+Créer une archive contenant:
+- tous les fichiers des dossiers `src`
+- tous autres fichiers nécessaires à l'utilisation de votre application (ex. image ajoutée)
+- le rapport respectant le gabarit (disponible sur Moodle) 
+
+Soumettez cette archive sur Moodle avant la deadline. N'oubliez pas de remplir le [teammates](https://teammatesv4.appspot.com/web/front/home) pour l'évaluation croisée des pairs. 
+
+<!-- Markdeep: -->
+<style class="fallback">
+    body {
+        visibility: hidden
+    }
+</style>
+<script src="https://morgan3d.github.io/markdeep/latest/markdeep.min.js?" charset="utf-8"></script> 
