@@ -84,7 +84,7 @@ private:
     // - camera position
     glm::vec3 m_position;
     // - camera up vector
-    const glm::vec3 m_up = glm::vec3(0, 1, 0);
+    glm::vec3 m_up = glm::vec3(0, 1, 0);
     // - view direction
     glm::vec3 m_direction;
 
